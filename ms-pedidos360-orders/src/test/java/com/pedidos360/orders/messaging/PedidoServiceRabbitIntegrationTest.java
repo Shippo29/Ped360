@@ -28,6 +28,8 @@ import org.springframework.http.MediaType;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -37,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
@@ -180,6 +183,15 @@ class PedidoServiceRabbitIntegrationTest {
             assertNotNull(mensajeFallido, "El NACK no publicó en el exchange fanout de DLQ");
             String payload = new String(mensajeFallido.getBody(), java.nio.charset.StandardCharsets.UTF_8);
             assertTrue(payload.contains("\"forzarFalloParaDlq\":true"));
+            Object xDeathHeader = mensajeFallido.getMessageProperties().getHeaders().get("x-death");
+            assertTrue(xDeathHeader instanceof List<?>, "El mensaje debe incluir el header x-death");
+            List<?> xDeath = (List<?>) xDeathHeader;
+            assertFalse(xDeath.isEmpty(), "El header x-death debe incluir el rechazo");
+            assertTrue(xDeath.get(0) instanceof Map<?, ?>, "La entrada x-death debe ser un mapa");
+            Map<?, ?> death = (Map<?, ?>) xDeath.get(0);
+            assertTrue(death.get("count") instanceof Number, "x-death debe incluir un count numérico");
+            assertEquals(1L, ((Number) death.get("count")).longValue(),
+                    "El NACK sin requeue debe enviar el mensaje a la DLQ una sola vez");
             assertNull(rabbitTemplate.receive(observerQueueName, 100),
                     "El mensaje forzado debe llegar una sola vez a la DLQ");
             esperarColaVacia(deadLetterQueue);
@@ -199,10 +211,8 @@ class PedidoServiceRabbitIntegrationTest {
     private void comprobarMensajeUnico(String queueName, Long pedidoId) {
         QueueInformation info = rabbitAdmin.getQueueInfo(queueName);
         assertNotNull(info, "La cola observadora no existe: " + queueName);
-        assertEquals(1, info.getMessageCount(),
-                "Debe enrutarse exactamente un mensaje a " + queueName);
         Message evento = rabbitTemplate.receive(queueName, 10_000);
-        assertNotNull(evento, "No se encoló el evento en " + queueName);
+        assertNotNull(evento, "Debe enrutarse exactamente un mensaje a " + queueName);
         String payload = new String(evento.getBody(), java.nio.charset.StandardCharsets.UTF_8);
         assertTrue(payload.contains("\"pedidoId\":" + pedidoId));
         assertNull(rabbitTemplate.receive(queueName, 100),
