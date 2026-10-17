@@ -1,0 +1,17 @@
+﻿# Frontend (Angular / Node)
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Backend (Spring Boot / Maven / IDEs)
+**/target/
+**/.classpath
+**/.project
+**/.settings/
+**/*.iml
+**/.idea/
+
+# Entorno y Sistema
+.DS_Store
+Thumbs.db
+*.env

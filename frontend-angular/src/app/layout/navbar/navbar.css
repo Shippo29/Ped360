@@ -1,0 +1,67 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: #1f2937;
+  color: #f9fafb;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.navbar__marca a {
+  color: #f9fafb;
+  font-weight: 700;
+  font-size: 1.15rem;
+  text-decoration: none;
+}
+
+.navbar__links {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.navbar__links a {
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.navbar__links a.activo,
+.navbar__links a:hover {
+  color: #f9fafb;
+  text-decoration: underline;
+}
+
+.navbar__usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.navbar__nombre {
+  color: #e5e7eb;
+}
+
+.navbar__rol {
+  background: #374151;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.navbar button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.navbar button:hover {
+  background: #1d4ed8;
+}

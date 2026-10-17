@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-10-17T02:50:00Z",
+  "generatedOnPlatform": "win32",
+  "projectType": "webapp",
+  "setup": [],
+  "assertions": [
+    {
+      "name": "production-build",
+      "kind": "process",
+      "command": "npm",
+      "args": ["run", "build"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "auth-role-unit-tests",
+      "kind": "process",
+      "command": "npx",
+      "args": ["vitest", "run", "src/app/core/auth.service.spec.ts"],
+      "verificationMethod": "test-results",
+      "expected": "0",
+      "timeoutSeconds": 120
+    },
+    {
+      "name": "angular-home-serves",
+      "kind": "http-probe",
+      "startCommand": "npm",
+      "startArgs": ["run", "start", "--", "--host", "127.0.0.1", "--port", "4200"],
+      "url": "http://127.0.0.1:4200/",
+      "verificationMethod": "http-status",
+      "expected": "200",
+      "timeoutSeconds": 120
+    }
+  ]
+}

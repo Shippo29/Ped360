@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ms-pedidos360-orders
+  rabbitmq:
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USER:guest}
+    password: ${RABBIT_PASSWORD:guest}
+    listener:
+      simple:
+        acknowledge-mode: manual
+        default-requeue-rejected: false
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:pedidosdb}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://login.microsoftonline.com/${ENTRA_TENANT_ID}/v2.0
+
+catalog:
+  service:
+    url: ${CATALOG_SERVICE_URL:http://localhost:8081}
+
+pedidos360:
+  rabbit:
+    exchange: ${RABBIT_EXCHANGE:pedidos.exchange}
+    dlx: ${RABBIT_DLX:pedidos.dlx}
+    routing-key: ${RABBIT_ROUTING_KEY:pedido.aceptado}
+    dead-letter-routing-key: ${RABBIT_DLQ_ROUTING_KEY:dlq}
+    queues:
+      notificaciones: ${RABBIT_QUEUE_NOTIFICACIONES:pedidos.notificaciones.queue}
+      inventario: ${RABBIT_QUEUE_INVENTARIO:pedidos.inventario.queue}
+      dlq: ${RABBIT_QUEUE_DLQ:pedidos.dlq}

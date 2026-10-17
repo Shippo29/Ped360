@@ -1,0 +1,71 @@
+<div class="page">
+  <a routerLink="/pedidos">&larr; Volver a pedidos</a>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (pedido(); as p) {
+    <h1>Pedido #{{ p.id }}</h1>
+
+    <p>
+      Estado actual:
+      <span class="badge" [class]="p.estado">{{ p.estado }}</span>
+    </p>
+    <p>Creado: {{ p.fechaCreacion | date: 'medium' }}</p>
+    @if (p.fechaActualizacion) {
+      <p>Última actualización: {{ p.fechaActualizacion | date: 'medium' }}</p>
+    }
+
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio unitario</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of p.items; track item.productoId) {
+          <tr>
+            <td>{{ item.nombreProducto }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>{{ item.precioUnitario | number: '1.0-0' }}</td>
+            <td>{{ item.precioUnitario * item.cantidad | number: '1.0-0' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <p style="text-align: right; font-weight: 600; margin-top: 0.75rem;">
+      Total: {{ p.total | number: '1.0-0' }}
+    </p>
+
+    @if (puedeCambiarEstado()) {
+      <div style="margin-top: 1.5rem;">
+        <h2 style="font-size: 1.05rem;">Cambiar estado</h2>
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        @if (siguientesEstados().length === 0) {
+          <p>Este pedido ya está en un estado final ({{ p.estado }}).</p>
+        } @else {
+          <div style="display:flex; gap: 0.6rem; flex-wrap: wrap;">
+            @for (destino of siguientesEstados(); track destino) {
+              <button
+                class="btn"
+                [class.peligro]="destino === 'CANCELADO'"
+                [disabled]="actualizando()"
+                (click)="cambiarEstado(destino)">
+                Pasar a {{ destino }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <p class="error">{{ error() }}</p>
+  }
+</div>

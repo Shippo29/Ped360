@@ -1,0 +1,39 @@
+<div class="page">
+  <div style="display:flex; justify-content: space-between; align-items:center;">
+    <h1>{{ auth.esCliente() && !auth.puedeGestionarPedidos() ? 'Mis pedidos' : 'Pedidos' }}</h1>
+    <a class="btn" routerLink="/pedidos/nuevo">+ Nuevo pedido</a>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else if (pedidos().length === 0) {
+    <p>No hay pedidos todavía.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Estado</th>
+          <th>Fecha creación</th>
+          <th>Ítems</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (pedido of pedidos(); track pedido.id) {
+          <tr>
+            <td>#{{ pedido.id }}</td>
+            <td><span class="badge" [class]="pedido.estado">{{ pedido.estado }}</span></td>
+            <td>{{ pedido.fechaCreacion | date: 'short' }}</td>
+            <td>{{ pedido.items.length }}</td>
+            <td>{{ pedido.total | number: '1.0-0' }}</td>
+            <td><a [routerLink]="['/pedidos', pedido.id]">Ver detalle</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

@@ -1,0 +1,29 @@
+<nav class="navbar">
+  <div class="navbar__marca">
+    <a routerLink="/">Pedidos360</a>
+  </div>
+
+  @if (auth.estaAutenticado()) {
+    <div class="navbar__links">
+      <a routerLink="/dashboard" routerLinkActive="activo">Dashboard</a>
+      <a routerLink="/pedidos" routerLinkActive="activo">Pedidos</a>
+      <a routerLink="/catalogo" routerLinkActive="activo">Catálogo</a>
+      @if (auth.puedeGestionarPedidos() || auth.esCliente()) {
+        <a routerLink="/pedidos/nuevo" routerLinkActive="activo">Nuevo pedido</a>
+      }
+      @if (auth.esAdmin()) {
+        <a routerLink="/catalogo/nuevo" routerLinkActive="activo">Nuevo producto</a>
+      }
+    </div>
+
+    <div class="navbar__usuario">
+      <span class="navbar__nombre">{{ auth.nombreUsuario() }}</span>
+      @if (auth.roles().length > 0) {
+        <span class="navbar__rol">{{ auth.roles().join(', ') }}</span>
+      }
+      <button (click)="logout()">Cerrar sesión</button>
+    </div>
+  } @else {
+    <button class="navbar__login" (click)="login()">Iniciar sesión con Microsoft</button>
+  }
+</nav>

@@ -1,0 +1,104 @@
+{
+  "planHash": "1ac18eaac0bc09dfdb8dedc34238a0fbbcb5291d8dd7aa28520547c95cc32ff7",
+  "phase": "standalone",
+  "recordedAtUtc": "2026-10-17T02:52:18.1862158Z",
+  "retryCount": 0,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "production-build",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E frontend-angular@0.0.0 build\r\n\u003E ng build\r\n\r\n\u001B[33m\u003E\u001B[39m Building...\r\n\u001B[32m\u221A\u001B[39m Building...\r\n\u001B[1mInitial chunk files\u001B[22m\u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m                        \u001B[2m | \u001B[22m \u001B[1mRaw size\u001B[22m\u001B[2m | \u001B[22m\u001B[1mEstimated transfer size\u001B[22m\r\n\u001B[32mchunk-WZP6HOVB.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                            \u001B[2m | \u001B[22m\u001B[36m278.48 kB\u001B[39m\u001B[2m | \u001B[22m               \u001B[36m61.15 kB\u001B[39m\r\n\u001B[32mchunk-QB556RPT.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                            \u001B[2m | \u001B[22m\u001B[36m270.78 kB\u001B[39m\u001B[2m | \u001B[22m               \u001B[36m74.29 kB\u001B[39m\r\n\u001B[32mmain-OPWO3HQW.js\u001B[39m   \u001B[2m | \u001B[22m\u001B[2mmain\u001B[22m                         \u001B[2m | \u001B[22m \u001B[36m41.93 kB\u001B[39m\u001B[2m | \u001B[22m               \u001B[36m13.61 kB\u001B[39m\r\n\u001B[32mstyles-BTD7WKK6.css\u001B[39m\u001B[2m | \u001B[22m\u001B[2mstyles\u001B[22m                       \u001B[2m | \u001B[22m  \u001B[36m2.24 kB\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m736 bytes\u001B[39m\r\n\u001B[32mchunk-X6YHEMIY.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                            \u001B[2m | \u001B[22m  \u001B[36m1.62 kB\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m407 bytes\u001B[39m\r\n\u001B[32mchunk-EOULDKCD.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                            \u001B[2m | \u001B[22m\u001B[36m725 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m725 bytes\u001B[39m\r\n\r\n\u001B[1m \u001B[22m                  \u001B[2m | \u001B[22m\u001B[1mInitial total\u001B[22m                \u001B[2m | \u001B[22m\u001B[1m595.77 kB\u001B[22m\u001B[2m | \u001B[22m              \u001B[1m150.92 kB\u001B[22m\r\n\r\n\u001B[1mLazy chunk files\u001B[22m   \u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m                        \u001B[2m | \u001B[22m \u001B[1mRaw size\u001B[22m\u001B[2m | \u001B[22m\u001B[1mEstimated transfer size\u001B[22m\r\n\u001B[32mchunk-3IKIE33S.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                            \u001B[2m | \u001B[22m \u001B[36m28.09 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m6.23 kB\u001B[39m\r\n\u001B[32mchunk-5KBQLEU7.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mdashboard\u001B[22m                    \u001B[2m | \u001B[22m  \u001B[36m6.94 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m2.33 kB\u001B[39m\r\n\u001B[32mchunk-DW7RO2XU.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mpedido-crear\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m5.44 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m1.99 kB\u001B[39m\r\n\u001B[32mchunk-5IGEZ77U.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mpedido-detalle\u001B[22m               \u001B[2m | \u001B[22m  \u001B[36m4.29 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m1.70 kB\u001B[39m\r\n\u001B[32mchunk-GSH5GOWB.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mproducto-form\u001B[22m                \u001B[2m | \u001B[22m  \u001B[36m3.32 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m1.27 kB\u001B[39m\r\n\u001B[32mchunk-PYZ55T2L.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mcatalogo-list\u001B[22m                \u001B[2m | \u001B[22m  \u001B[36m2.62 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m1.17 kB\u001B[39m\r\n\u001B[32mchunk-W33W6LCB.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mpedidos-list\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m2.45 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m1.13 kB\u001B[39m\r\n\u001B[32mchunk-AZ6LXYKZ.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                            \u001B[2m | \u001B[22m\u001B[36m517 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m517 bytes\u001B[39m\r\n\u001B[32mchunk-3V4FWVOQ.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                            \u001B[2m | \u001B[22m\u001B[36m500 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m500 bytes\u001B[39m\r\n\u001B[32mchunk-3GPOADBV.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mBrowserPerformanceMeasurement\u001B[22m\u001B[2m | \u001B[22m\u001B[36m107 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m107 bytes\u001B[39m\r\n\r\nApplication bundle generation complete. [10.111 seconds] - 2026-10-17T02:51:54.805Z\r\n\r\nOutput location: C:\\Users\\Shippo29\\Downloads\\Ped360-local (1)\\Ped360\\frontend-angular\\dist\\frontend-angular\r\n\r\n",
+        "durationMs": 16250
+      },
+      {
+        "name": "auth-role-unit-tests",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n RUN  v4.1.11 C:/Users/Shippo29/Downloads/Ped360-local (1)/Ped360/frontend-angular\r\n\r\n\r\n Test Files  1 passed (1)\r\n      Tests  5 passed (5)\r\n   Start at  23:52:01\r\n   Duration  1.79s (transform 202ms, setup 0ms, import 1.32s, tests 6ms, environment 1ms)\r\n\r\n",
+        "durationMs": 8819,
+        "testResults": {
+          "testFramework": "vitest",
+          "runnerDetectedFrom": "package_json",
+          "testsTotal": 5,
+          "testsPassed": 5,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": false
+        }
+      },
+      {
+        "name": "angular-home-serves",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\n\u003Chtml lang=\u0022en\u0022\u003E\n  \u003Chead\u003E\n    \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\n    \u003Cmeta charset=\u0022utf-8\u0022/\u003E\n    \u003Ctitle\u003EFrontendAngular\u003C/title\u003E\n    \u003Cbase href=\u0022/\u0022/\u003E\n    \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1\u0022/\u003E\n    \u003Clink rel=\u0022icon\u0022 type=\u0022image/x-icon\u0022 href=\u0022favicon.ico\u0022/\u003E\n  \u003Clink rel=\u0022stylesheet\u0022 href=\u0022styles.css\u0022\u003E\u003C/head\u003E\n  \u003Cbody\u003E\n    \u003Capp-root\u003E\u003C/app-root\u003E\n  \u003Cscript src=\u0022main.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003C/body\u003E\n\u003C/html\u003E\n\n--- server output ---\n\r\n\u003E frontend-angular@0.0.0 start\r\n\u003E ng serve --host 127.0.0.1 --port 4200\r\n\r\n\u001B[33m\u003E\u001B[39m Building...\r\n\u001B[32m\u221A\u001B[39m Building...\r\n\u001B[1mInitial chunk files\u001B[22m\u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m         \u001B[2m | \u001B[22m\u001B[1mRaw size\u001B[22m\r\n\u001B[32mmain.js\u001B[39m            \u001B[2m | \u001B[22m\u001B[2mmain\u001B[22m          \u001B[2m | \u001B[22m\u001B[36m17.54 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-W24IKZAP.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m             \u001B[2m | \u001B[22m \u001B[36m6.59 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mstyles.css\u001B[39m         \u001B[2m | \u001B[22m\u001B[2mstyles\u001B[22m        \u001B[2m | \u001B[22m \u001B[36m2.93 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-S57KMBTJ.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m             \u001B[2m | \u001B[22m \u001B[36m1.50 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\r\n\u001B[1m \u001B[22m                  \u001B[2m | \u001B[22m\u001B[1mInitial total\u001B[22m \u001B[2m | \u001B[22m\u001B[1m28.55 kB\u001B[22m\r\n\r\n\u001B[1mLazy chunk files\u001B[22m   \u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m         \u001B[2m | \u001B[22m\u001B[1mRaw size\u001B[22m\r\n\u001B[32mchunk-XCNHXKCB.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mdashboard\u001B[22m     \u001B[2m | \u001B[22m\u001B[36m26.17 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-QY4S6DK5.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mpedido-crear\u001B[22m  \u001B[2m | \u001B[22m\u001B[36m19.27 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-7PEWCQ4Q.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mpedido-detalle\u001B[22m\u001B[2m | \u001B[22m\u001B[36m16.22 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-AR726NNM.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mproducto-form\u001B[22m \u001B[2m | \u001B[22m\u001B[36m12.23 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-ZIWXULP7.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mcatalogo-list\u001B[22m \u001B[2m | \u001B[22m\u001B[36m10.68 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-X4MWP5NG.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mpedidos-list\u001B[22m  \u001B[2m | \u001B[22m \u001B[36m9.65 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-CNN3NA3E.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m             \u001B[2m | \u001B[22m \u001B[36m1.46 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-4AQWKBF3.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m             \u001B[2m | \u001B[22m \u001B[36m1.45 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\r\nApplication bundle generation complete. [6.805 seconds] - 2026-10-17T02:52:16.392Z\r\n\r\nWatch mode enabled. Watching for file changes...\r\nNOTE: Raw file sizes do not reflect development server per-request transformations.\r\n\u001B[2m11:52:17 p.\u00A0m.\u001B[22m \u001B[36m\u001B[1m[vite]\u001B[22m\u001B[39m \u001B[90m\u001B[2m(client)\u001B[22m\u001B[39m Re-optimizing dependencies because vite config has changed\r\n  \u001B[32m\u279C\u001B[39m  \u001B[1mLocal\u001B[22m:   \u001B[36mhttp://127.0.0.1:\u001B[1m4200\u001B[22m/\u001B[39m\r\n",
+        "durationMs": 14033
+      }
+    ],
+    "executions": [
+      {
+        "source": "production-build",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "C:\\Users\\Shippo29\\Downloads\\Ped360-local (1)\\Ped360\\frontend-angular",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "auth-role-unit-tests",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npx.CMD",
+        "args": [
+          "vitest",
+          "run",
+          "src/app/core/auth.service.spec.ts"
+        ],
+        "cwd": "C:\\Users\\Shippo29\\Downloads\\Ped360-local (1)\\Ped360\\frontend-angular",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "angular-home-serves",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "start",
+          "--",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "4200"
+        ],
+        "cwd": "C:\\Users\\Shippo29\\Downloads\\Ped360-local (1)\\Ped360\\frontend-angular",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

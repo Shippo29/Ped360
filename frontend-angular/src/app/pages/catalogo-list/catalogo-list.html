@@ -1,0 +1,47 @@
+<div class="page">
+  <div style="display:flex; justify-content: space-between; align-items:center;">
+    <h1>Catálogo</h1>
+    @if (auth.esAdmin()) {
+      <a class="btn" routerLink="/catalogo/nuevo">+ Nuevo producto</a>
+    }
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else if (productos().length === 0) {
+    <p>No hay productos cargados todavía.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          @if (auth.esAdmin()) { <th></th> }
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of productos(); track p.id) {
+          <tr>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.descripcion || '—' }}</td>
+            <td>{{ p.precio | number: '1.0-0' }}</td>
+            <td>{{ p.stock }}</td>
+            <td>
+              <span class="badge" [class.ACEPTADO]="p.activo" [class.CANCELADO]="!p.activo">
+                {{ p.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            @if (auth.esAdmin()) {
+              <td><a [routerLink]="['/catalogo', p.id, 'editar']">Editar</a></td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

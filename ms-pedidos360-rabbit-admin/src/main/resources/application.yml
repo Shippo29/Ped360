@@ -1,0 +1,15 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: ms-pedidos360-rabbit-admin
+  rabbitmq:
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USER:guest}
+    password: ${RABBIT_PASSWORD:guest}
+
+pedidos360:
+  rabbit:
+    management-url: ${RABBIT_MANAGEMENT_URL:http://localhost:15672}

@@ -1,0 +1,24 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ms-pedidos360-bff
+
+# URLs de los microservicios "reales" detrás del BFF. En local apuntan a
+# localhost; en AWS se sobrescriben con variables de entorno (igual que
+# catalog.service.url en ms-pedidos360-orders), por ejemplo apuntando a
+# "http://localhost:8080"/"http://localhost:8081" si corren en la misma EC2,
+# o a hosts internos distintos si cada servicio tiene su propia instancia.
+orders:
+  service:
+    url: ${ORDERS_SERVICE_URL:http://localhost:8080}
+
+catalog:
+  service:
+    url: ${CATALOG_SERVICE_URL:http://localhost:8081}
+
+# Orígenes del frontend permitidos para CORS (ver CorsConfig). El frontend
+# ahora le habla solo al BFF, nunca directo a orders/catalog.
+frontend:
+  allowed-origins: ${FRONTEND_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200,https://localhost:4200,https://127.0.0.1:4200}

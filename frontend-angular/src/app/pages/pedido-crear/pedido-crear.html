@@ -1,0 +1,78 @@
+<div class="page">
+  <a routerLink="/pedidos">&larr; Volver a pedidos</a>
+  <h1>Nuevo pedido</h1>
+
+  @if (cargando()) {
+    <p>Cargando catálogo...</p>
+  } @else {
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    @if (productos().length === 0) {
+      <p>No hay productos con stock disponible en este momento.</p>
+    } @else {
+      <div style="display:flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <div class="form-grupo" style="flex: 2; min-width: 220px;">
+          <label>Producto</label>
+          <select
+            [ngModel]="productoSeleccionadoId()"
+            (ngModelChange)="productoSeleccionadoId.set($event)">
+            <option [ngValue]="null">-- Selecciona un producto --</option>
+            @for (p of productos(); track p.id) {
+              <option [ngValue]="p.id">{{ p.nombre }} — {{ p.precio | number: '1.0-0' }} (stock: {{ p.stock }})</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-grupo" style="width: 100px;">
+          <label>Cantidad</label>
+          <input
+            type="number"
+            min="1"
+            [ngModel]="cantidadSeleccionada()"
+            (ngModelChange)="cantidadSeleccionada.set($event)">
+        </div>
+
+        <button class="btn secundario" (click)="agregarAlCarrito()">Agregar</button>
+      </div>
+    }
+
+    @if (carrito().length > 0) {
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (linea of carrito(); track linea.productoId) {
+            <tr>
+              <td>{{ linea.nombreProducto }}</td>
+              <td>{{ linea.cantidad }}</td>
+              <td>{{ linea.precioUnitario | number: '1.0-0' }}</td>
+              <td>{{ linea.precioUnitario * linea.cantidad | number: '1.0-0' }}</td>
+              <td><a href="javascript:void(0)" (click)="quitarLinea(linea.productoId)">Quitar</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <p style="text-align: right; font-weight: 600; margin-top: 0.75rem;">
+        Total: {{ total() | number: '1.0-0' }}
+      </p>
+
+      <div style="text-align: right;">
+        <button class="btn" [disabled]="enviando()" (click)="confirmarPedido()">
+          {{ enviando() ? 'Enviando...' : 'Confirmar pedido' }}
+        </button>
+      </div>
+    } @else {
+      <p>Agrega productos para armar el pedido.</p>
+    }
+  }
+</div>
