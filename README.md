@@ -48,7 +48,7 @@ la API de RabbitMQ Management.
 
 ## Ejecutar en local
 
-Se requiere JDK 21 en `PATH` o `JAVA_HOME`, Node.js y Docker Desktop iniciado.
+Se requiere JDK 21 o superior; si cambias de JDK, ejecuta `mvnw clean` antes de compilar. También se requiere Node.js y Docker Desktop iniciado.
 El wrapper Maven descarga Maven cuando hace falta.
 
 1. Prepara configuración local sin versionar el archivo real:
