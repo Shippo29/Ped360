@@ -27,4 +27,11 @@ public class DownstreamClientsConfig {
                                          @Value("${catalog.service.url}") String catalogUrl) {
         return builder.baseUrl(catalogUrl).build();
     }
+
+    @Bean
+    @Qualifier("notificationsRestClient")
+    public RestClient notificationsRestClient(RestClient.Builder builder,
+                                               @Value("${notifications.service.url}") String notificationsUrl) {
+        return builder.baseUrl(notificationsUrl).build();
+    }
 }

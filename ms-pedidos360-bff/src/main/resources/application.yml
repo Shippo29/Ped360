@@ -18,6 +18,10 @@ catalog:
   service:
     url: ${CATALOG_SERVICE_URL:http://localhost:8081}
 
+notifications:
+  service:
+    url: ${NOTIFICATIONS_SERVICE_URL:http://localhost:8083}
+
 # Orígenes del frontend permitidos para CORS (ver CorsConfig). El frontend
 # ahora le habla solo al BFF, nunca directo a orders/catalog.
 frontend:

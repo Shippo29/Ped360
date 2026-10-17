@@ -1,0 +1,34 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: ms-pedidos360-notifications
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        acknowledge-mode: manual
+        default-requeue-rejected: false
+
+pedidos360:
+  rabbit:
+    direct-exchange: ${PEDIDOS_DIRECT_EXCHANGE:pedidos.direct}
+    topic-exchange: ${PEDIDOS_TOPIC_EXCHANGE:pedidos.topic}
+    dead-letter-exchange: ${PEDIDOS_DLX:pedidos.dlx}
+    dead-letter-routing-key: ${PEDIDOS_DLQ_ROUTING_KEY:pedido.dlq}
+    queues:
+      notificaciones: ${PEDIDOS_QUEUE_NOTIFICACIONES:cola.notificaciones}
+      cocina-preparacion: ${PEDIDOS_QUEUE_COCINA:cola.cocina-preparacion}
+      facturacion-documentos: ${PEDIDOS_QUEUE_FACTURACION:cola.facturacion-documentos}
+      dlq: ${PEDIDOS_QUEUE_DLQ:cola.pedidos.dlq}
+    routing-keys:
+      cocina: ${PEDIDOS_ROUTING_KEY_COCINA:pedido.cocina}
+      factura: ${PEDIDOS_ROUTING_KEY_FACTURA:pedido.factura}
+      notificacion-creado: ${PEDIDOS_ROUTING_KEY_NOTIFICACION_CREADO:pedido.notificacion.creado}
+      notificacion-aceptado: ${PEDIDOS_ROUTING_KEY_NOTIFICACION_ACEPTADO:pedido.notificacion.aceptado}
+      notificacion-despachado: ${PEDIDOS_ROUTING_KEY_NOTIFICACION_DESPACHADO:pedido.notificacion.despachado}
+      patron-notificaciones: ${PEDIDOS_ROUTING_KEY_NOTIFICACIONES:pedido.notificacion.*}

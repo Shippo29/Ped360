@@ -9,31 +9,31 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "pedidos360.rabbit")
 public class RabbitProperties {
 
-    private String directExchange = "pedidos.direct";
-    private String topicExchange = "pedidos.topic";
-    private String deadLetterExchange = "pedidos.dlx";
-    private String deadLetterRoutingKey = "pedido.dlq";
+    private String directExchange;
+    private String topicExchange;
+    private String deadLetterExchange;
+    private String deadLetterRoutingKey;
     private Queues queues = new Queues();
     private RoutingKeys routingKeys = new RoutingKeys();
 
     @Getter
     @Setter
     public static class Queues {
-        private String notificaciones = "cola.notificaciones";
-        private String cocinaPreparacion = "cola.cocina-preparacion";
-        private String facturacionDocumentos = "cola.facturacion-documentos";
-        private String dlq = "cola.pedidos.dlq";
+        private String notificaciones;
+        private String cocinaPreparacion;
+        private String facturacionDocumentos;
+        private String dlq;
     }
 
     @Getter
     @Setter
     public static class RoutingKeys {
-        private String cocina = "pedido.cocina";
-        private String factura = "pedido.factura";
-        private String notificacionCreado = "pedido.notificacion.creado";
-        private String notificacionAceptado = "pedido.notificacion.aceptado";
-        private String notificacionDespachado = "pedido.notificacion.despachado";
-        private String patronNotificaciones = "pedido.notificacion.*";
+        private String cocina;
+        private String factura;
+        private String notificacionCreado;
+        private String notificacionAceptado;
+        private String notificacionDespachado;
+        private String patronNotificaciones;
         private String deadLetter = "pedido.dlq";
     }
 }

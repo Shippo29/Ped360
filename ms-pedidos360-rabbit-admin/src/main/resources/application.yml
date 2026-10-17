@@ -1,14 +1,14 @@
 server:
-  port: ${SERVER_PORT:8083}
+  port: ${SERVER_PORT:8084}
 
 spring:
   application:
     name: ms-pedidos360-rabbit-admin
   rabbitmq:
-    host: ${RABBIT_HOST:localhost}
-    port: ${RABBIT_PORT:5672}
-    username: ${RABBIT_USER:guest}
-    password: ${RABBIT_PASSWORD:guest}
+    host: ${RABBITMQ_HOST:${RABBIT_HOST:localhost}}
+    port: ${RABBITMQ_PORT:${RABBIT_PORT:5672}}
+    username: ${RABBITMQ_USER:${RABBIT_USER:guest}}
+    password: ${RABBITMQ_PASSWORD:${RABBIT_PASSWORD:guest}}
 
 pedidos360:
   rabbit:
