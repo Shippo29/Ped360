@@ -1,22 +1,168 @@
 services:
   postgres:
-    image: postgres:16
+    image: postgres:16-alpine
     container_name: pedidos360-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
-      - "5433:5432"
+      - "${DB_PORT:-5433}:5432"
     volumes:
       - pedidos360_pgdata:/var/lib/postgresql/data
-      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - pedidos360-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3-management-alpine
     container_name: pedidos360-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-pedidos360}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-replace-before-exposing}
     ports:
       - "5672:5672"
       - "15672:15672"
+    volumes:
+      - pedidos360_rabbitdata:/var/lib/rabbitmq
+    networks:
+      - pedidos360-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  catalog:
+    build:
+      context: .
+      dockerfile: ms-pedidos360-catalog/Dockerfile
+    container_name: pedidos360-catalog
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: catalogodb
+      ENTRA_TENANT_ID: ${ENTRA_TENANT_ID:-}
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pedidos360-net
+
+  orders:
+    build:
+      context: .
+      dockerfile: ms-pedidos360-orders/Dockerfile
+    container_name: pedidos360-orders
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: pedidosdb
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-pedidos360}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-replace-before-exposing}
+      CATALOG_SERVICE_URL: http://catalog:8081
+      ENTRA_TENANT_ID: ${ENTRA_TENANT_ID:-}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      catalog:
+        condition: service_healthy
+    networks:
+      - pedidos360-net
+
+  notifications:
+    build:
+      context: .
+      dockerfile: ms-pedidos360-notifications/Dockerfile
+    container_name: pedidos360-notifications
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-pedidos360}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-replace-before-exposing}
+    ports:
+      - "8083:8083"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pedidos360-net
+
+  rabbit-admin:
+    build:
+      context: .
+      dockerfile: ms-pedidos360-rabbit-admin/Dockerfile
+    container_name: pedidos360-rabbit-admin
+    environment:
+      SERVER_PORT: 8084
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-pedidos360}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-replace-before-exposing}
+      RABBIT_MANAGEMENT_URL: http://rabbitmq:15672
+    ports:
+      - "8084:8084"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pedidos360-net
+
+  bff:
+    build:
+      context: .
+      dockerfile: ms-pedidos360-bff/Dockerfile
+    container_name: pedidos360-bff
+    environment:
+      ORDERS_SERVICE_URL: http://orders:8080
+      CATALOG_SERVICE_URL: http://catalog:8081
+      NOTIFICATIONS_SERVICE_URL: http://notifications:8083
+      FRONTEND_ALLOWED_ORIGINS: ${FRONTEND_ALLOWED_ORIGINS:-http://localhost:4200,http://127.0.0.1:4200}
+    ports:
+      - "8082:8082"
+    depends_on:
+      orders:
+        condition: service_healthy
+      catalog:
+        condition: service_healthy
+      notifications:
+        condition: service_healthy
+    networks:
+      - pedidos360-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend-angular/Dockerfile
+    container_name: pedidos360-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      bff:
+        condition: service_healthy
+    networks:
+      - pedidos360-net
 
 volumes:
   pedidos360_pgdata:
+  pedidos360_rabbitdata:
+
+networks:
+  pedidos360-net:
+    driver: bridge
