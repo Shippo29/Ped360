@@ -15,15 +15,6 @@ import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
-/**
- * Comunicación server-to-server con ms-pedidos360-catalog. Se reenvía el
- * Access Token del actor que originó la request, así Catálogo sigue
- * validando los mismos permisos por rol (Operador/Admin) sin necesidad de
- * credenciales de servicio separadas — suficiente para el alcance de EP1.
- *
- * A futuro (EP2/EP3) este punto es el candidato natural para volverse
- * asíncrono vía RabbitMQ/Kafka en vez de una llamada REST síncrona.
- */
 @Component
 public class ProductoClient {
 
@@ -60,13 +51,6 @@ public class ProductoClient {
         }
     }
 
-    /**
-     * Descuenta el stock de TODOS los ítems de un pedido en una sola llamada
-     * HTTP, para que Catálogo los aplique en una única transacción local
-     * (todo o nada). Reemplaza el enfoque anterior de una llamada por ítem,
-     * que podía dejar descuentos parciales aplicados en Catálogo si un ítem
-     * intermedio fallaba por falta de stock.
-     */
     public void descontarStockBatch(List<DescontarStockBatchRequest.ItemDescontar> items) {
         try {
             restClient.put()

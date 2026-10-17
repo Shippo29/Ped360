@@ -11,7 +11,6 @@ const ESTADOS_ACTIVOS: EstadoPedido[] = ['CREADO', 'ACEPTADO', 'EN_PREPARACION',
 const TODOS_LOS_ESTADOS: EstadoPedido[] = [
   'CREADO', 'ACEPTADO', 'EN_PREPARACION', 'DESPACHADO', 'ENTREGADO', 'CANCELADO'
 ];
-/** Umbral simple para marcar "stock bajo" en el resumen de Admin. */
 const UMBRAL_STOCK_BAJO = 5;
 
 @Component({
@@ -75,8 +74,6 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    // Pedidos: el backend ya filtra "los míos" si el actor es Cliente.
-    // Productos: se piden para el resumen de catálogo (relevante sobre todo para Admin).
     this.pedidosService.listar().subscribe({
       next: (pedidos) => {
         this.pedidos.set(pedidos);
@@ -96,7 +93,6 @@ export class DashboardComponent implements OnInit {
         this.cargando.set(false);
       },
       error: () => {
-        // El resumen de catálogo es un "plus": si falla, no bloqueamos el dashboard entero.
         this.cargando.set(false);
       }
     });

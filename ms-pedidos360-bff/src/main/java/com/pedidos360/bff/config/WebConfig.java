@@ -5,11 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * CORS centralizado acá: como el frontend ahora solo le habla al BFF (nunca
- * directo a orders/catalog), este es el único lugar donde hay que mantener
- * la lista de orígenes permitidos.
- */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 

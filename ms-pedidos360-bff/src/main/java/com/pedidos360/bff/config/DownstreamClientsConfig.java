@@ -6,11 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
-/**
- * Un RestClient por microservicio real que hay detrás del BFF. Cada uno
- * apunta a su propia base URL (orders.service.url / catalog.service.url),
- * configurable por variable de entorno igual que en ms-pedidos360-orders.
- */
 @Configuration
 public class DownstreamClientsConfig {
 

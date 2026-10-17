@@ -6,7 +6,6 @@ export type EstadoPedido =
   | 'ENTREGADO'
   | 'CANCELADO';
 
-/** Transiciones válidas, espejo de EstadoPedido.java en ms-pedidos360-orders. */
 export const TRANSICIONES_VALIDAS: Record<EstadoPedido, EstadoPedido[]> = {
   CREADO: ['ACEPTADO', 'CANCELADO'],
   ACEPTADO: ['EN_PREPARACION', 'CANCELADO'],

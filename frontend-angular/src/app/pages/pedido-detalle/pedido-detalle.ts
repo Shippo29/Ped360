@@ -17,7 +17,6 @@ export class PedidoDetalleComponent implements OnInit {
   error = signal('');
   actualizando = signal(false);
 
-  /** Solo Operador/Admin pueden avanzar el estado (regla del backend). */
   puedeCambiarEstado = computed(() => this.auth.puedeGestionarPedidos());
 
   siguientesEstados = computed<EstadoPedido[]>(() => {

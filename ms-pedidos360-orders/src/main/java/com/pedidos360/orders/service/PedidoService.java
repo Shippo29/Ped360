@@ -39,8 +39,6 @@ public class PedidoService {
                 .build();
 
         for (CrearPedidoRequest.ItemPedidoRequest itemReq : request.getItems()) {
-            // Se consulta Catálogo (otro servicio) para obtener nombre y precio
-            // vigentes; se "congelan" en el pedido al momento de crearlo.
             ProductoDTO producto = productoClient.obtenerProducto(itemReq.getProductoId());
 
             PedidoItem item = PedidoItem.builder()
@@ -70,10 +68,6 @@ public class PedidoService {
         return idActor;
     }
 
-    /**
-     * Lista pedidos según el actor autenticado: un CLIENTE solo ve los suyos;
-     * ADMIN/OPERADOR ven todos (para supervisión y gestión operativa).
-     */
     @Transactional(readOnly = true)
     public List<PedidoResponse> listarSegunActor() {
         List<Pedido> pedidos = actorContext.esCliente()
@@ -105,26 +99,6 @@ public class PedidoService {
                             + " (recuerda: un pedido no puede DESPACHARSE si no fue ACEPTADO antes)");
         }
 
-        // Regla mínima: al aceptar el pedido, se descuenta el stock en Catálogo.
-        // Se envían TODOS los ítems en una sola llamada (ver
-        // ProductoClient.descontarStockBatch / ProductoService.descontarStockBatch
-        // en Catálogo), que los aplica como una única transacción atómica allá:
-        // o se descuentan todos los ítems, o no se descuenta ninguno. Esto evita
-        // el problema que había antes al llamar item por item (una llamada HTTP
-        // por ítem): si el ítem 2 fallaba por falta de stock, el descuento del
-        // ítem 1 quedaba aplicado en la base de datos de Catálogo aunque esta
-        // transacción local de Orders revirtiera el cambio de estado del pedido
-        // (dos servicios, dos bases de datos distintas, sin transacción
-        // distribuida entre ambas).
-        //
-        // Nota: esta llamada sigue sin ser parte de la misma transacción de BD
-        // que el cambio de estado de este servicio (son dos servicios, dos
-        // bases de datos). Un fallo de red *después* de que Catálogo confirme
-        // el descuento (pero antes de que la respuesta llegue aquí) podría
-        // dejar el pedido sin actualizar su estado aunque el stock ya se haya
-        // descontado: ese caso residual es el tipo de escenario que en EP2 se
-        // resuelve mejor con un evento en RabbitMQ (con reintentos/idempotencia)
-        // que con esta llamada síncrona.
         if (nuevoEstado == EstadoPedido.ACEPTADO) {
             List<DescontarStockBatchRequest.ItemDescontar> items = pedido.getItems().stream()
                     .map(item -> new DescontarStockBatchRequest.ItemDescontar(

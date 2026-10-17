@@ -31,13 +31,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Los preflight OPTIONS del navegador (CORS) nunca llevan token —
-                // hay que dejarlos pasar explícitamente, o Spring Security los
-                // bloquea igual que cualquier otra request sin Authorization.
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/publico/**").permitAll()
-                // El detalle fino de permisos por rol se aplica con @PreAuthorize
-                // en cada método de controller (ver PedidoController / ProductoController).
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->

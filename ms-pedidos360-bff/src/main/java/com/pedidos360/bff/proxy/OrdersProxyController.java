@@ -7,11 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
-/**
- * Todo lo que el frontend manda a /api/orders/** se reenvía tal cual a
- * ms-pedidos360-orders (ver ProxyService). No se duplican DTOs ni reglas de
- * negocio acá: el BFF es solo el punto de entrada único para el frontend.
- */
 @RestController
 public class OrdersProxyController {
 

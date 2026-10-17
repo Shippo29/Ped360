@@ -11,12 +11,6 @@ import lombok.Setter;
 
 import java.util.List;
 
-/**
- * Descuento de stock para TODOS los ítems de un pedido en una sola llamada,
- * para que Catálogo pueda aplicarlos como una única transacción local
- * (todo o nada) en vez de que Orders los pida uno por uno. Ver
- * ProductoService.descontarStockBatch().
- */
 @Getter
 @Setter
 @NoArgsConstructor

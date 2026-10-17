@@ -15,13 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class CrearPedidoRequest {
 
-    /**
-     * Opcional. Solo tiene efecto si el actor autenticado es Operador o Admin:
-     * permite registrar un pedido "por encargo" (ej. telefónico) a nombre del
-     * cliente real indicado aquí. Si el actor es Cliente, este valor se
-     * ignora siempre y el pedido queda a nombre del propio actor (nunca se
-     * confía en un clienteId enviado por el cliente mismo).
-     */
     private String clienteId;
 
     @NotEmpty(message = "el pedido debe tener al menos un producto")

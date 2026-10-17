@@ -1,8 +1,3 @@
-// Configuración de DESARROLLO (usada por "ng serve" / "npm start").
-// El frontend le habla solo al BFF (puerto 8082), que es quien reenvía a
-// ms-pedidos360-orders y ms-pedidos360-catalog. Por eso ambas URLs apuntan
-// al mismo host: ya no hay necesidad de que el navegador conozca los
-// puertos 8080/8081 directamente.
 export const environment = {
   production: false,
   ordersApiUrl: 'http://localhost:8082/api',

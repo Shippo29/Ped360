@@ -11,10 +11,6 @@ import java.util.List;
 @Component
 public class ActorContext {
 
-    /**
-     * Identificador estable del usuario autenticado (claim "oid" de Entra ID;
-     * si no viene, cae a "sub"). Se usa para saber de quién es cada pedido.
-     */
     public String obtenerIdActor() {
         Jwt jwt = obtenerJwt();
         String oid = jwt.getClaimAsString("oid");

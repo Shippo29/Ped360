@@ -21,14 +21,12 @@ public class ProductoController {
 
     private final ProductoService productoService;
 
-    // Consulta de catálogo: cualquier actor autenticado.
     @GetMapping
     @PreAuthorize("hasAnyRole('Cliente', 'Operador', 'Admin')")
     public List<ProductoResponse> listar() {
         return productoService.listar();
     }
 
-    // Usado también por ms-pedidos360-orders para obtener precio/nombre al crear un pedido.
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('Cliente', 'Operador', 'Admin')")
     public ProductoResponse detalle(@PathVariable Long id) {
@@ -48,17 +46,12 @@ public class ProductoController {
         return productoService.editar(id, request);
     }
 
-    // Endpoint interno: solo lo invoca ms-pedidos360-orders al aceptar un pedido
-    // (reenviando el JWT del Operador/Admin que hizo el cambio de estado).
     @PutMapping("/{id}/stock/decrement")
     @PreAuthorize("hasAnyRole('Operador', 'Admin')")
     public ProductoResponse descontarStock(@PathVariable Long id, @Valid @RequestBody DescontarStockRequest request) {
         return productoService.descontarStock(id, request.getCantidad());
     }
 
-    // Endpoint interno: lo invoca ms-pedidos360-orders al aceptar un pedido,
-    // enviando TODOS los ítems en una sola llamada para que el descuento sea
-    // atómico (todo o nada) dentro de una única transacción de este servicio.
     @PutMapping("/stock/decrement-batch")
     @PreAuthorize("hasAnyRole('Operador', 'Admin')")
     public List<ProductoResponse> descontarStockBatch(@Valid @RequestBody DescontarStockBatchRequest request) {

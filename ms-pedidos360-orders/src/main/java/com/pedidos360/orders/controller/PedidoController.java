@@ -20,8 +20,6 @@ public class PedidoController {
 
     private final PedidoService pedidoService;
 
-    // Cliente crea sus propios pedidos; Operador/Admin también pueden generarlos
-    // (p.ej. pedido tomado por teléfono, o supervisión).
     @PostMapping
     @PreAuthorize("hasAnyRole('Cliente', 'Operador', 'Admin')")
     public ResponseEntity<PedidoResponse> crear(@Valid @RequestBody CrearPedidoRequest request) {
@@ -29,7 +27,6 @@ public class PedidoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
-    // Listado filtrado según el actor: Cliente ve solo los suyos (filtrado en el service).
     @GetMapping
     @PreAuthorize("hasAnyRole('Cliente', 'Operador', 'Admin')")
     public List<PedidoResponse> listar() {
@@ -42,7 +39,6 @@ public class PedidoController {
         return pedidoService.obtenerDetalle(id);
     }
 
-    // Solo Operador/Admin pueden avanzar el estado operacional del pedido.
     @PutMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('Operador', 'Admin')")
     public PedidoResponse cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambiarEstadoRequest request) {

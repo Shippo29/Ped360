@@ -25,10 +25,6 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Identificador del actor dueño del pedido (claim "oid"/"sub" del JWT de
-     * Entra ID). Se usa para filtrar "mis pedidos" cuando el actor es CLIENTE.
-     */
     @Column(nullable = false, length = 100)
     private String clienteId;
 

@@ -1,6 +1,3 @@
-// Configuración de PRODUCCIÓN (build con --configuration production).
-// azure.* y las IP/puertos reales se terminan de fijar cuando se despliegue
-// a EC2 + Entra ID (ver checklist pendiente del proyecto).
 export const environment = {
   production: true,
   ordersApiUrl: 'https://o2d0br883c.execute-api.us-east-1.amazonaws.com/orders-api/api',

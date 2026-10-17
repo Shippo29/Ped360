@@ -60,7 +60,6 @@ export class AuthService {
   readonly esAdmin = computed(() => this.roles().includes('Admin'));
   readonly esOperador = computed(() => this.roles().includes('Operador'));
   readonly esCliente = computed(() => this.roles().includes('Cliente'));
-  /** Admin/Operador comparten las pantallas de gestión operativa de pedidos. */
   readonly puedeGestionarPedidos = computed(() => this.esAdmin() || this.esOperador());
 
   constructor(private msalService: MsalService) {}

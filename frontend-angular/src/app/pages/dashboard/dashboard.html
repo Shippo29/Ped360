@@ -22,7 +22,6 @@
       }
 
       <div class="dashboard__tarjetas">
-        <!-- Cliente: ve solo el resumen de SUS pedidos (el backend ya filtra). -->
         @if (auth.esCliente() && !auth.puedeGestionarPedidos()) {
           <div class="tarjeta">
             <span class="tarjeta__numero">{{ totalPedidos() }}</span>
@@ -34,7 +33,6 @@
           </div>
         }
 
-        <!-- Operador: foco operativo, cuántos pedidos requieren su gestión. -->
         @if (auth.esOperador()) {
           <div class="tarjeta">
             <span class="tarjeta__numero">{{ contadoresPorEstado()['CREADO'] ?? 0 }}</span>
@@ -46,7 +44,6 @@
           </div>
         }
 
-        <!-- Admin: visión completa del negocio (pedidos + catálogo/stock). -->
         @if (auth.esAdmin()) {
           <div class="tarjeta">
             <span class="tarjeta__numero">{{ totalPedidos() }}</span>

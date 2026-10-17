@@ -1,6 +1,3 @@
-/* Estilos globales mínimos para tablas, formularios y botones compartidos
-   entre las páginas. No es un design system, solo lo suficiente para que
-   las vistas sean usables mientras se prueba el flujo funcional. */
 
 * {
   box-sizing: border-box;

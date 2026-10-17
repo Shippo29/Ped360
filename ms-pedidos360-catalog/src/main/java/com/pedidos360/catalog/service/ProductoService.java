@@ -53,11 +53,6 @@ public class ProductoService {
         return ProductoResponse.desde(productoRepository.save(producto));
     }
 
-    /**
-     * Descuento atómico de stock, invocado por ms-pedidos360-orders cuando un
-     * pedido pasa a ACEPTADO. Vive acá (y no en Orders) porque el stock es
-     * responsabilidad exclusiva de este servicio ahora que están separados.
-     */
     @Transactional
     public ProductoResponse descontarStock(Long id, int cantidad) {
         Producto producto = buscarPorId(id);
@@ -70,23 +65,6 @@ public class ProductoService {
         return ProductoResponse.desde(productoRepository.save(producto));
     }
 
-    /**
-     * Descuenta el stock de TODOS los ítems de un pedido en una única
-     * transacción local de este servicio: si cualquier ítem no tiene stock
-     * suficiente (o no existe), se lanza la excepción ANTES de guardar nada
-     * y Spring hace rollback de los descuentos ya aplicados en este mismo
-     * método (todo o nada).
-     *
-     * Esto resuelve el problema de consistencia que existía al descontar
-     * ítem por ítem con llamadas HTTP separadas desde Orders: con ese
-     * enfoque, si el ítem 1 se descontaba y el ítem 2 fallaba por falta de
-     * stock, el descuento del ítem 1 quedaba aplicado en la base de datos de
-     * Catálogo aunque Orders revirtiera el cambio de estado del pedido en su
-     * propia base de datos (dos servicios, dos transacciones distintas).
-     * Ahora toda la validación y el descuento ocurren dentro de la misma
-     * transacción de Catálogo, así que o se aplican todos los ítems o no se
-     * aplica ninguno.
-     */
     @Transactional
     public List<ProductoResponse> descontarStockBatch(DescontarStockBatchRequest request) {
         List<Producto> productos = request.getItems().stream()
@@ -101,8 +79,6 @@ public class ProductoService {
                 })
                 .toList();
 
-        // Validación completa (arriba) antes de modificar nada: así, si un
-        // ítem intermedio falla, ningún ítem anterior llega a descontarse.
         for (int i = 0; i < productos.size(); i++) {
             productos.get(i).descontarStock(request.getItems().get(i).getCantidad());
         }

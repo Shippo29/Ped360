@@ -9,12 +9,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-/**
- * Línea de un pedido. Ya no tiene una relación JPA hacia Producto: Catálogo
- * vive en su propio servicio y su propia base de datos. Por eso se guarda
- * solo el id del producto más un "snapshot" de nombre y precio al momento
- * de crear el pedido (así el pedido no cambia si después editan el producto).
- */
 @Entity
 @Table(name = "pedido_items")
 @Getter
@@ -41,7 +35,6 @@ public class PedidoItem {
     @Column(nullable = false)
     private Integer cantidad;
 
-    /** Precio unitario "congelado" al momento de crear el pedido. */
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal precioUnitario;
 }

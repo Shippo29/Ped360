@@ -44,11 +44,6 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   };
 }
 
-/**
- * Mapea qué URLs necesitan token y con qué scope. Ambos microservicios
- * (orders y catalog) comparten el mismo App Registration/scope de backend,
- * así que un solo access token sirve para llamar a los dos.
- */
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string> | null>();
   protectedResourceMap.set(`${environment.ordersApiUrl}/*`, [environment.azure.scope]);
@@ -60,13 +55,6 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   };
 }
 
-/**
- * MSAL necesita inicializarse y procesar la respuesta de redirección de
- * Microsoft ANTES de que la app renderice cualquier componente; si no, el
- * login por redirect deja la cuenta "a medio setear". Antes esto vivía en
- * App.ngOnInit — se movió acá para que corra siempre, sin depender de qué
- * componente se monte primero.
- */
 export function initializeMsalFactory(msalService: MsalService): () => Promise<void> {
   return () =>
     msalService.instance.initialize().then(() =>

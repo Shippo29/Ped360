@@ -21,12 +21,6 @@ public enum EstadoPedido {
             CANCELADO, EnumSet.noneOf(EstadoPedido.class)
     );
 
-    /**
-     * Regla clave del negocio: un pedido nunca puede saltar directo a DESPACHADO
-     * sin haber pasado antes por ACEPTADO -> EN_PREPARACION. Al modelar las
-     * transiciones como un grafo lineal, esa regla queda garantizada por
-     * construcción (no existe arista CREADO -> DESPACHADO).
-     */
     public boolean puedeTransicionarA(EstadoPedido destino) {
         return TRANSICIONES_VALIDAS.getOrDefault(this, Set.of()).contains(destino);
     }

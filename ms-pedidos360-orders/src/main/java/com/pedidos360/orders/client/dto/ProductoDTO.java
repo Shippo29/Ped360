@@ -7,11 +7,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-/**
- * Réplica del contrato JSON expuesto por ms-pedidos360-catalog
- * (GET /api/catalog/products/{id}). No es una entidad JPA: Orders no es
- * dueño de estos datos, solo los consume.
- */
 @Getter
 @Setter
 @NoArgsConstructor
