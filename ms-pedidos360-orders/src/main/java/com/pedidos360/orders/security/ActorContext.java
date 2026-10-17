@@ -6,6 +6,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ActorContext {
 
@@ -37,6 +39,33 @@ public class ActorContext {
 
     public boolean esOperador() {
         return tieneRol("Operador");
+    }
+
+    public String obtenerUsername() {
+        try {
+            Jwt jwt = obtenerJwt();
+            String username = jwt.getClaimAsString("preferred_username");
+            if (username == null || username.isBlank()) {
+                username = jwt.getClaimAsString("name");
+            }
+            if (username == null || username.isBlank()) {
+                username = obtenerIdActor();
+            }
+            return username == null || username.isBlank() ? "sistema" : username;
+        } catch (RuntimeException ex) {
+            return "sistema";
+        }
+    }
+
+    public List<String> obtenerRoles() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getAuthorities() == null) {
+            return List.of();
+        }
+        return auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(authority -> authority.startsWith("ROLE_") ? authority.substring(5) : authority)
+                .toList();
     }
 
     private Jwt obtenerJwt() {

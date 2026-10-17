@@ -5,10 +5,10 @@ spring:
   application:
     name: ms-pedidos360-orders
   rabbitmq:
-    host: ${RABBIT_HOST:localhost}
-    port: ${RABBIT_PORT:5672}
-    username: ${RABBIT_USER:guest}
-    password: ${RABBIT_PASSWORD:guest}
+    host: ${RABBITMQ_HOST:${RABBIT_HOST:localhost}}
+    port: ${RABBITMQ_PORT:${RABBIT_PORT:5672}}
+    username: ${RABBITMQ_USER:${RABBIT_USER:guest}}
+    password: ${RABBITMQ_PASSWORD:${RABBIT_PASSWORD:guest}}
     listener:
       simple:
         acknowledge-mode: manual
@@ -38,11 +38,19 @@ catalog:
 
 pedidos360:
   rabbit:
-    exchange: ${RABBIT_EXCHANGE:pedidos.exchange}
-    dlx: ${RABBIT_DLX:pedidos.dlx}
-    routing-key: ${RABBIT_ROUTING_KEY:pedido.aceptado}
-    dead-letter-routing-key: ${RABBIT_DLQ_ROUTING_KEY:dlq}
+    direct-exchange: ${PEDIDOS_DIRECT_EXCHANGE:pedidos.direct}
+    topic-exchange: ${PEDIDOS_TOPIC_EXCHANGE:pedidos.topic}
+    dead-letter-exchange: ${PEDIDOS_DLX:pedidos.dlx}
+    dead-letter-routing-key: ${PEDIDOS_DLQ_ROUTING_KEY:pedido.dlq}
     queues:
-      notificaciones: ${RABBIT_QUEUE_NOTIFICACIONES:pedidos.notificaciones.queue}
-      inventario: ${RABBIT_QUEUE_INVENTARIO:pedidos.inventario.queue}
-      dlq: ${RABBIT_QUEUE_DLQ:pedidos.dlq}
+      notificaciones: ${PEDIDOS_QUEUE_NOTIFICACIONES:cola.notificaciones}
+      cocina-preparacion: ${PEDIDOS_QUEUE_COCINA:cola.cocina-preparacion}
+      facturacion-documentos: ${PEDIDOS_QUEUE_FACTURACION:cola.facturacion-documentos}
+      dlq: ${PEDIDOS_QUEUE_DLQ:cola.pedidos.dlq}
+    routing-keys:
+      cocina: ${PEDIDOS_ROUTING_KEY_COCINA:pedido.cocina}
+      factura: ${PEDIDOS_ROUTING_KEY_FACTURA:pedido.factura}
+      notificacion-creado: ${PEDIDOS_ROUTING_KEY_NOTIFICACION_CREADO:pedido.notificacion.creado}
+      notificacion-aceptado: ${PEDIDOS_ROUTING_KEY_NOTIFICACION_ACEPTADO:pedido.notificacion.aceptado}
+      notificacion-despachado: ${PEDIDOS_ROUTING_KEY_NOTIFICACION_DESPACHADO:pedido.notificacion.despachado}
+      patron-notificaciones: ${PEDIDOS_ROUTING_KEY_NOTIFICACIONES:pedido.notificacion.*}

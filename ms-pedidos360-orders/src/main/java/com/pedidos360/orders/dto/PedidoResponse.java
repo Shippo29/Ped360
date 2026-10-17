@@ -29,10 +29,6 @@ public class PedidoResponse {
                 .map(ItemPedidoResponse::desde)
                 .toList();
 
-        BigDecimal total = items.stream()
-                .map(i -> i.getPrecioUnitario().multiply(BigDecimal.valueOf(i.getCantidad())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         return PedidoResponse.builder()
                 .id(pedido.getId())
                 .clienteId(pedido.getClienteId())
@@ -40,7 +36,7 @@ public class PedidoResponse {
                 .fechaCreacion(pedido.getFechaCreacion())
                 .fechaActualizacion(pedido.getFechaActualizacion())
                 .items(items)
-                .total(total)
+                .total(pedido.calcularTotal())
                 .build();
     }
 

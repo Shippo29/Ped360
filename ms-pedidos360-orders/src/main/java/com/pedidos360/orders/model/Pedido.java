@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "pedidos")
@@ -49,5 +50,14 @@ public class Pedido {
     public void agregarItem(PedidoItem item) {
         item.setPedido(this);
         this.items.add(item);
+    }
+
+    public BigDecimal calcularTotal() {
+        if (items == null || items.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return items.stream()
+                .map(item -> item.getPrecioUnitario().multiply(BigDecimal.valueOf(item.getCantidad())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

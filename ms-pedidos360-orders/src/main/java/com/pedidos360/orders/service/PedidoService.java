@@ -7,7 +7,7 @@ import com.pedidos360.orders.dto.CrearPedidoRequest;
 import com.pedidos360.orders.dto.PedidoResponse;
 import com.pedidos360.orders.exception.RecursoNoEncontradoException;
 import com.pedidos360.orders.exception.TransicionEstadoInvalidaException;
-import com.pedidos360.orders.messaging.producer.PedidoEventPublisher;
+import com.pedidos360.orders.messaging.producer.PedidoMessageProducer;
 import com.pedidos360.orders.model.EstadoPedido;
 import com.pedidos360.orders.model.Pedido;
 import com.pedidos360.orders.model.PedidoItem;
@@ -28,7 +28,7 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ProductoClient productoClient;
     private final ActorContext actorContext;
-    private final PedidoEventPublisher pedidoEventPublisher;
+    private final PedidoMessageProducer pedidoMessageProducer;
 
     @Transactional
     public PedidoResponse crear(CrearPedidoRequest request) {
@@ -52,7 +52,9 @@ public class PedidoService {
             pedido.agregarItem(item);
         }
 
-        return PedidoResponse.desde(pedidoRepository.save(pedido));
+        Pedido pedidoGuardado = pedidoRepository.save(pedido);
+        pedidoMessageProducer.publicarPedidoCreado(pedidoGuardado);
+        return PedidoResponse.desde(pedidoGuardado);
     }
 
 
@@ -136,10 +138,17 @@ public class PedidoService {
         Pedido pedidoGuardado = pedidoRepository.save(pedido);
 
         if (nuevoEstado == EstadoPedido.ACEPTADO) {
-            pedidoEventPublisher.publicarPedidoAceptado(pedidoGuardado);
+            pedidoMessageProducer.publicarPedidoAceptado(pedidoGuardado);
+        } else if (nuevoEstado == EstadoPedido.DESPACHADO) {
+            pedidoMessageProducer.publicarPedidoDespachado(pedidoGuardado);
         }
 
         return PedidoResponse.desde(pedidoGuardado);
+    }
+
+    @Transactional(readOnly = true)
+    public void simularErrorDlq(Long id) {
+        pedidoMessageProducer.publicarMensajePrueba(buscarPorId(id));
     }
 
     private Pedido buscarPorId(Long id) {

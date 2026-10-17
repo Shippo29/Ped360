@@ -48,4 +48,11 @@ public class PedidoController {
     public PedidoResponse cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambiarEstadoRequest request) {
         return pedidoService.cambiarEstado(id, request.getNuevoEstado());
     }
+
+    @PostMapping("/{id}/simular-error-dlq")
+    @PreAuthorize("hasAnyRole('Operador','Admin')")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void simularErrorDlq(@PathVariable Long id) {
+        pedidoService.simularErrorDlq(id);
+    }
 }

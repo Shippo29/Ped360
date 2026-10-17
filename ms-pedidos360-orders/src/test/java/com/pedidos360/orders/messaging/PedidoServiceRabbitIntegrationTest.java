@@ -50,29 +50,31 @@ class PedidoServiceRabbitIntegrationTest {
     @MockitoBean
     private ProductoClient productoClient;
 
-    @Value("${pedidos360.rabbit.exchange}")
+    @Value("${pedidos360.rabbit.topic-exchange}")
     private String exchangeName;
 
-    @Value("${pedidos360.rabbit.routing-key}")
+    @Value("${pedidos360.rabbit.routing-keys.notificacion-aceptado}")
     private String routingKey;
 
     @Value("${pedidos360.rabbit.queues.notificaciones}")
     private String notificacionesQueue;
 
-    @Value("${pedidos360.rabbit.queues.inventario}")
-    private String inventarioQueue;
+    @Value("${pedidos360.rabbit.queues.cocina-preparacion}")
+    private String cocinaQueue;
+
+    @Value("${pedidos360.rabbit.queues.facturacion-documentos}")
+    private String facturacionQueue;
 
     @Test
     void aceptarPedidoPublicaEventoRealEnRabbitMq() {
         comprobarColaVacia(notificacionesQueue);
-        comprobarColaVacia(inventarioQueue);
+        comprobarColaVacia(cocinaQueue);
+        comprobarColaVacia(facturacionQueue);
 
         String observerQueueName = "ep3.integration." + UUID.randomUUID().toString().replace("-", "");
         Queue observerQueue = new Queue(observerQueueName, false, true, true);
         rabbitAdmin.declareQueue(observerQueue);
-        Binding observerBinding = BindingBuilder.bind(observerQueue)
-                .to(new TopicExchange(exchangeName))
-                .with(routingKey);
+        Binding observerBinding = BindingBuilder.bind(observerQueue).to(new TopicExchange(exchangeName)).with(routingKey);
         rabbitAdmin.declareBinding(observerBinding);
 
         try {
@@ -98,7 +100,8 @@ class PedidoServiceRabbitIntegrationTest {
             assertTrue(payload.contains("\"pedidoId\":" + guardado.getId()));
             assertTrue(payload.contains("\"estado\":\"ACEPTADO\""));
             confirmarColaDeNegocioSiNoTieneConsumidor(notificacionesQueue, guardado.getId());
-            confirmarColaDeNegocioSiNoTieneConsumidor(inventarioQueue, guardado.getId());
+            confirmarColaDeNegocioSiNoTieneConsumidor(cocinaQueue, guardado.getId());
+            confirmarColaDeNegocioSiNoTieneConsumidor(facturacionQueue, guardado.getId());
         } finally {
             rabbitAdmin.removeBinding(observerBinding);
             rabbitAdmin.deleteQueue(observerQueueName);
