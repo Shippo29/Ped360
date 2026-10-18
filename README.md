@@ -14,7 +14,8 @@ Microsoft Entra ID y RabbitMQ.
 | Rabbit-admin | 8084 | Administración REST de colas, exchanges y bindings |
 | Frontend Angular/Nginx | 4200 (Docker) | Aplicación web |
 | PostgreSQL | 5433 host / 5432 Docker | Bases `catalogodb` y `pedidosdb` |
-| RabbitMQ | 5672 AMQP / 15672 Management | Broker y consola local |
+| RabbitMQ 1 | 5672 AMQP / 15672 Management | Nodo principal |
+| RabbitMQ 2 | 5673 AMQP / 15673 Management | Segundo nodo del clúster |
 
 Orders y Catalog necesitan `ENTRA_TENANT_ID` válido para autenticar peticiones.
 No se almacenan claves ni identificadores reales en el repositorio.
@@ -27,13 +28,21 @@ Orders y Notifications declaran la misma topología durable:
 | --- | --- | --- |
 | Direct exchange | `pedidos.direct` | `pedido.cocina` → `cola.cocina-preparacion`; `pedido.factura` → `cola.facturacion-documentos` |
 | Topic exchange | `pedidos.topic` | `pedido.notificacion.*` → `cola.notificaciones` |
-| Fanout DLX | `pedidos.dlx` | → `cola.pedidos.dlq` |
+| Direct DLX | `pedidos.dlx` | Routing key independiente para cada DLQ |
 
-Las tres colas de negocio son durables y usan `pedidos.dlx` con
-`pedido.dlq` como dead-letter routing key. La DLQ es durable y no tiene
-argumentos. Las notificaciones usan ACK manual; una excepción provoca
-`basicNack(tag, false, false)`, sin requeue ni política de retry automático.
-Notifications registra los mensajes recibidos en la DLQ con nivel `ERROR`.
+Cada cola de negocio es durable y dirige los rechazos a su propia DLQ durable:
+`cola.notificaciones.dlq`, `cola.cocina-preparacion.dlq` y
+`cola.facturacion-documentos.dlq`. Un error registra `log.error` y ejecuta
+`basicNack(tag, false, false)`, sin requeue. El consumer de DLQ confirma mensajes
+por defecto; se desactiva para una demo con `DLQ_CONSUMER_ENABLED=false`.
+
+Compose crea dos nodos RabbitMQ 3 con volúmenes nuevos separados y el mismo
+`RABBITMQ_ERLANG_COOKIE`. No reutiliza ni elimina `pedidos360_rabbitdata`.
+Las colas clásicas se replican mediante `ha-mode=all` y
+`ha-sync-mode=automatic`; la política de retención incluye también HA porque
+RabbitMQ aplica una sola política coincidente por cola. La retención limita las
+DLQ a 10 000 mensajes y siete días, con `overflow=drop-head`. Ejecuta
+`.\scripts\ep4\Aplicar-PoliticasRabbit.ps1` después de iniciar rabbit-admin.
 
 Orders publica cada cambio una sola vez: al crear (`pedido.notificacion.creado`),
 al aceptar envía un comando a cocina, otro a facturación y una notificación de
@@ -62,20 +71,27 @@ El wrapper Maven descarga Maven cuando hace falta.
    `.env.example` contiene solo valores de muestra; sustituye sus placeholders.
    No uses ni publiques secretos reales en el repositorio.
 
-2. Valida la configuración y arranca la pila completa:
+2. Valida Compose y arranca solo PostgreSQL y RabbitMQ:
 
    ```powershell
    docker compose config
-   docker compose up --build -d
+   docker ps -a --filter "name=pedidos360-rabbitmq"
+   # Si el broker antiguo está en ejecución, detenlo sin borrarlo.
+   docker stop pedidos360-rabbitmq
+   docker compose up -d postgres
+   docker compose up -d rabbitmq1
+   docker compose up -d rabbitmq2
    docker compose ps
    ```
 
-   Postgres publica `5433:5432`; entre contenedores la conexión usa `postgres:5432`.
-   RabbitMQ está disponible en `localhost:5672` y su consola en
-   `http://localhost:15672`. El usuario/contraseña de muestra de RabbitMQ no
-   deben reutilizarse en entornos compartidos o expuestos.
+   No uses `docker compose down -v`. Postgres publica `5433:5432`.
+   RabbitMQ está en `localhost:5672` y `localhost:5673`, y sus consolas en
+   `http://localhost:15672` y `http://localhost:15673`. Comprueba el clúster con
+   `docker exec pedidos360-rabbitmq1 rabbitmq-diagnostics cluster_status`.
+   Inicia cada servicio en una terminal independiente siguiendo
+   [GUIA_EJECUCION.md](./GUIA_EJECUCION.md).
 
-3. Compila todo con tests y sin fijar `JAVA_HOME` a una ruta de máquina:
+3. Compila y prueba con JDK 21 o superior:
 
    ```powershell
    .\build-all.bat
@@ -85,10 +101,8 @@ El wrapper Maven descarga Maven cuando hace falta.
    Set-Location ..
    ```
 
-   Para iniciar servicios fuera de Docker, ejecuta cada `mvnw.cmd
-   spring-boot:run` desde su módulo y configura `DB_HOST=localhost`,
-   `DB_PORT=5433`, `RABBITMQ_HOST=localhost`, las credenciales locales y
-   `ENTRA_TENANT_ID`. El BFF queda en `http://localhost:8082`.
+   Para iniciar servicios fuera de Docker, configura `JAVA_HOME` solo en cada
+   terminal y usa `RABBITMQ_ADDRESSES=localhost:5672,localhost:5673`.
 
 ## Probar el flujo de pedidos y DLQ
 
@@ -107,7 +121,7 @@ La aceptación envía un mensaje a cocina, uno a facturación y uno a notificaci
 Con los consumers ejecutándose, revisa ACK, conteos y errores:
 
 ```powershell
-docker compose exec rabbitmq rabbitmqctl list_queues name messages consumers
+docker exec pedidos360-rabbitmq1 rabbitmqctl list_queues name messages consumers
 docker compose logs notifications
 ```
 
@@ -119,9 +133,18 @@ curl.exe -X POST http://localhost:8080/api/orders/1/simular-error-dlq `
 docker compose logs notifications
 ```
 
-El mensaje de prueba lleva `forzarFalloParaDlq=true`; Notificaciones lo rechaza
-sin reencolar, RabbitMQ lo envía a `cola.pedidos.dlq` y DeadLetterConsumer
-registra headers y payload con `log.error`.
+El mensaje de prueba lleva `forzarFalloParaDlq=true`; Notifications lo rechaza
+sin reencolar y RabbitMQ lo envía a `cola.notificaciones.dlq`. El NACK registra
+el error incluso con el consumer de DLQ desactivado.
+
+Para poblar Ready, Unacked y las DLQ, configura `CONSUMER_DELAY_MS` y
+`DLQ_CONSUMER_ENABLED` antes de iniciar Notifications y ejecuta
+`.\scripts\ep4\Publicar-MensajesDemo.ps1 -Count 15`. El script solicita usuario y
+contraseña RabbitMQ de forma oculta.
+
+Las políticas de retención se gestionan también con Rabbit-admin:
+`GET /policies`, `POST /policies` y `DELETE /policies/{name}`. La definición
+acepta TTL, max-length, overflow drop-head y los parámetros de HA clásicos.
 
 El historial en memoria se consulta por el BFF:
 
@@ -134,8 +157,8 @@ El endpoint correspondiente del servicio es
 
 Orders tiene un test de integración aislado de Entra y Catálogo (H2, cliente
 mock y usuario Operador de prueba en MockMvc). Para ejercer RabbitMQ real,
-levanta el broker y Notifications primero, configura las variables
-`RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USER` y `RABBITMQ_PASSWORD`, y ejecuta:
+levanta ambos nodos y Notifications primero, configura `RABBITMQ_ADDRESSES`,
+`RABBITMQ_USER` y `RABBITMQ_PASSWORD`, y ejecuta:
 
 ```powershell
 Set-Location ms-pedidos360-orders
@@ -180,8 +203,9 @@ Remove-Item .\admin-request.json
 ## Variables de entorno
 
 `.env.example` documenta `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`,
-`RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USER`, `RABBITMQ_PASSWORD`,
-`ENTRA_TENANT_ID`, `AZURE_CLIENT_ID`, `ORDERS_SERVICE_URL`,
-`CATALOG_SERVICE_URL`, `NOTIFICATIONS_SERVICE_URL` y
-`FRONTEND_ALLOWED_ORIGINS`. `docker-compose.yml` usa nombres DNS internos de
-Docker y publica Postgres en el puerto host configurado.
+`RABBITMQ_ADDRESSES`, `RABBITMQ_USER`, `RABBITMQ_PASSWORD`,
+`RABBITMQ_ERLANG_COOKIE`, `RABBIT_MANAGEMENT_URL(S)`,
+`DLQ_CONSUMER_ENABLED`, `CONSUMER_DELAY_MS`, `ENTRA_TENANT_ID`,
+`AZURE_CLIENT_ID`, `ORDERS_SERVICE_URL`, `CATALOG_SERVICE_URL`,
+`NOTIFICATIONS_SERVICE_URL` y `FRONTEND_ALLOWED_ORIGINS`. Compose usa DNS
+interno para PostgreSQL y RabbitMQ y puertos publicados separados en el host.
