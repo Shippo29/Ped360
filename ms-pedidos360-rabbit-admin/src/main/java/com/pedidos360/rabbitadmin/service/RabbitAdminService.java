@@ -1,6 +1,7 @@
 package com.pedidos360.rabbitadmin.service;
 
 import com.pedidos360.rabbitadmin.dto.BindingRequest;
+import com.pedidos360.rabbitadmin.dto.PolicyRequest;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.DirectExchange;
@@ -12,6 +13,7 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -61,6 +63,18 @@ public class RabbitAdminService {
                 routingKey(request),
                 Map.of());
         rabbitAdmin.removeBinding(binding);
+    }
+
+    public List<Map<String, Object>> listarPoliticas() {
+        return managementClient.listarPoliticas();
+    }
+
+    public void crearPolitica(PolicyRequest request) {
+        managementClient.crearPolitica(request);
+    }
+
+    public void eliminarPolitica(String nombre) {
+        managementClient.eliminarPolitica(nombre);
     }
 
     private Exchange construirExchange(String nombre, String tipo) {

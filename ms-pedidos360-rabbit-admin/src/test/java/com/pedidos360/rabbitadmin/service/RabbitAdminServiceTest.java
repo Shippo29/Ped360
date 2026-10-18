@@ -1,6 +1,7 @@
 package com.pedidos360.rabbitadmin.service;
 
 import com.pedidos360.rabbitadmin.dto.BindingRequest;
+import com.pedidos360.rabbitadmin.dto.PolicyRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,8 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -92,5 +95,19 @@ class RabbitAdminServiceTest {
         verify(rabbitAdmin).removeBinding(captor.capture());
         assertEquals("orders.queue", captor.getValue().getDestination());
         assertEquals("orders.exchange", captor.getValue().getExchange());
+    }
+
+    @Test
+    void administraPoliticasDelBroker() {
+        PolicyRequest request = new PolicyRequest("retencion", "^cola\\..*\\.dlq$",
+                "queues", 10, Map.of("message-ttl", 30000));
+
+        service.crearPolitica(request);
+        service.eliminarPolitica("retencion");
+        service.listarPoliticas();
+
+        verify(managementClient).crearPolitica(request);
+        verify(managementClient).eliminarPolitica("retencion");
+        verify(managementClient).listarPoliticas();
     }
 }

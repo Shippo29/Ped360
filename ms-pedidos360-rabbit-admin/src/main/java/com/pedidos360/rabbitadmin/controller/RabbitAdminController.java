@@ -2,6 +2,7 @@ package com.pedidos360.rabbitadmin.controller;
 
 import com.pedidos360.rabbitadmin.dto.BindingRequest;
 import com.pedidos360.rabbitadmin.dto.ExchangeRequest;
+import com.pedidos360.rabbitadmin.dto.PolicyRequest;
 import com.pedidos360.rabbitadmin.dto.QueueRequest;
 import com.pedidos360.rabbitadmin.service.RabbitAdminService;
 import jakarta.validation.Valid;
@@ -11,11 +12,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping
@@ -70,6 +75,26 @@ public class RabbitAdminController {
     @DeleteMapping("/bindings")
     public ResponseEntity<Void> eliminarBinding(@Valid @RequestBody BindingRequest request) {
         rabbitAdminService.eliminarBinding(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/policies")
+    public List<Map<String, Object>> listarPoliticas() {
+        return rabbitAdminService.listarPoliticas();
+    }
+
+    @PostMapping("/policies")
+    public ResponseEntity<Void> crearPolitica(@Valid @RequestBody PolicyRequest request) {
+        rabbitAdminService.crearPolitica(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/policies/{name}")
+    public ResponseEntity<Void> eliminarPolitica(
+            @PathVariable
+            @NotBlank(message = "El nombre de la política es obligatorio")
+            @Pattern(regexp = NAME_PATTERN, message = INVALID_NAME_MESSAGE) String name) {
+        rabbitAdminService.eliminarPolitica(name);
         return ResponseEntity.noContent().build();
     }
 }

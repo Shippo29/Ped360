@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,5 +37,16 @@ class AdminRequestValidationTest {
     @Test
     void aceptaBindingConRoutingKeyOpcional() {
         assertTrue(validator.validate(new BindingRequest("exchange", "queue", null)).isEmpty());
+    }
+
+    @Test
+    void validaPoliticasDeRetencionYAltaDisponibilidad() {
+        PolicyRequest policy = new PolicyRequest("retencion", "^cola\\..*\\.dlq$",
+                "queues", 10, Map.of("message-ttl", 30000, "max-length", 100, "overflow", "drop-head"));
+        assertTrue(validator.validate(policy).isEmpty());
+        assertFalse(validator.validate(new PolicyRequest("invalida", "[", "queues", 0,
+                Map.of("message-ttl", 0))).isEmpty());
+        assertFalse(validator.validate(new PolicyRequest("invalida", ".*", "queues", 0,
+                Map.of("ha-mode", "all", "otra-opcion", true))).isEmpty());
     }
 }
