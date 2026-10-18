@@ -11,7 +11,6 @@ public class RabbitProperties {
     private String directExchange;
     private String topicExchange;
     private String deadLetterExchange;
-    private String deadLetterRoutingKey;
     private Queues queues = new Queues();
     private RoutingKeys routingKeys = new RoutingKeys();
 
@@ -21,7 +20,9 @@ public class RabbitProperties {
         private String notificaciones;
         private String cocinaPreparacion;
         private String facturacionDocumentos;
-        private String dlq;
+        private String dlqNotificaciones;
+        private String dlqCocinaPreparacion;
+        private String dlqFacturacionDocumentos;
     }
 
     @Getter
@@ -33,5 +34,8 @@ public class RabbitProperties {
         private String notificacionAceptado;
         private String notificacionDespachado;
         private String patronNotificaciones;
+        private String dlqNotificaciones;
+        private String dlqCocinaPreparacion;
+        private String dlqFacturacionDocumentos;
     }
 }

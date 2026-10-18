@@ -5,26 +5,30 @@ spring:
   application:
     name: ms-pedidos360-notifications
   rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
+    addresses: ${RABBITMQ_ADDRESSES:localhost:5672,localhost:5673}
     username: ${RABBITMQ_USER:guest}
     password: ${RABBITMQ_PASSWORD:guest}
     listener:
       simple:
         acknowledge-mode: manual
         default-requeue-rejected: false
+        prefetch: 10
+        missing-queues-fatal: false
 
 pedidos360:
   rabbit:
     direct-exchange: ${PEDIDOS_DIRECT_EXCHANGE:pedidos.direct}
     topic-exchange: ${PEDIDOS_TOPIC_EXCHANGE:pedidos.topic}
     dead-letter-exchange: ${PEDIDOS_DLX:pedidos.dlx}
-    dead-letter-routing-key: ${PEDIDOS_DLQ_ROUTING_KEY:pedido.dlq}
+    dlq-consumer-enabled: ${DLQ_CONSUMER_ENABLED:true}
+    consumer-delay-ms: ${CONSUMER_DELAY_MS:0}
     queues:
       notificaciones: ${PEDIDOS_QUEUE_NOTIFICACIONES:cola.notificaciones}
       cocina-preparacion: ${PEDIDOS_QUEUE_COCINA:cola.cocina-preparacion}
       facturacion-documentos: ${PEDIDOS_QUEUE_FACTURACION:cola.facturacion-documentos}
-      dlq: ${PEDIDOS_QUEUE_DLQ:cola.pedidos.dlq}
+      dlq-notificaciones: ${PEDIDOS_QUEUE_DLQ_NOTIFICACIONES:cola.notificaciones.dlq}
+      dlq-cocina-preparacion: ${PEDIDOS_QUEUE_DLQ_COCINA:cola.cocina-preparacion.dlq}
+      dlq-facturacion-documentos: ${PEDIDOS_QUEUE_DLQ_FACTURACION:cola.facturacion-documentos.dlq}
     routing-keys:
       cocina: ${PEDIDOS_ROUTING_KEY_COCINA:pedido.cocina}
       factura: ${PEDIDOS_ROUTING_KEY_FACTURA:pedido.factura}
@@ -32,3 +36,6 @@ pedidos360:
       notificacion-aceptado: ${PEDIDOS_ROUTING_KEY_NOTIFICACION_ACEPTADO:pedido.notificacion.aceptado}
       notificacion-despachado: ${PEDIDOS_ROUTING_KEY_NOTIFICACION_DESPACHADO:pedido.notificacion.despachado}
       patron-notificaciones: ${PEDIDOS_ROUTING_KEY_NOTIFICACIONES:pedido.notificacion.*}
+      dlq-notificaciones: ${PEDIDOS_ROUTING_KEY_DLQ_NOTIFICACIONES:pedido.notificacion.dlq}
+      dlq-cocina-preparacion: ${PEDIDOS_ROUTING_KEY_DLQ_COCINA:pedido.cocina.dlq}
+      dlq-facturacion-documentos: ${PEDIDOS_ROUTING_KEY_DLQ_FACTURACION:pedido.factura.dlq}

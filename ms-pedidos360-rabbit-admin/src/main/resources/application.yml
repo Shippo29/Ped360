@@ -5,11 +5,10 @@ spring:
   application:
     name: ms-pedidos360-rabbit-admin
   rabbitmq:
-    host: ${RABBITMQ_HOST:${RABBIT_HOST:localhost}}
-    port: ${RABBITMQ_PORT:${RABBIT_PORT:5672}}
+    addresses: ${RABBITMQ_ADDRESSES:localhost:5672,localhost:5673}
     username: ${RABBITMQ_USER:${RABBIT_USER:guest}}
     password: ${RABBITMQ_PASSWORD:${RABBIT_PASSWORD:guest}}
 
 pedidos360:
   rabbit:
-    management-url: ${RABBIT_MANAGEMENT_URL:http://localhost:15672}
+    management-urls: ${RABBIT_MANAGEMENT_URLS:${RABBIT_MANAGEMENT_URL:http://localhost:15672,http://localhost:15673}}

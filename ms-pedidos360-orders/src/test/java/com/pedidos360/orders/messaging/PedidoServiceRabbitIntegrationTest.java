@@ -22,7 +22,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
@@ -88,8 +87,11 @@ class PedidoServiceRabbitIntegrationTest {
     @Value("${pedidos360.rabbit.queues.facturacion-documentos}")
     private String facturacionQueue;
 
-    @Value("${pedidos360.rabbit.queues.dlq}")
+    @Value("${pedidos360.rabbit.queues.dlq-notificaciones}")
     private String deadLetterQueue;
+
+    @Value("${pedidos360.rabbit.routing-keys.dlq-notificaciones}")
+    private String deadLetterRoutingKey;
 
     @Value("${pedidos360.rabbit.dead-letter-exchange}")
     private String deadLetterExchange;
@@ -160,16 +162,17 @@ class PedidoServiceRabbitIntegrationTest {
     @Test
     void endpointDePruebaProvocaNackYEnrutaUnaCopiaALaDlq() throws Exception {
         comprobarColaVacia(deadLetterQueue);
-        String observerQueueName = "ep3.dlq.integration." + UUID.randomUUID().toString().replace("-", "");
+        String observerQueueName = "ep4.dlq.integration." + UUID.randomUUID().toString().replace("-", "");
         Queue observerQueue = new Queue(observerQueueName, false, false, false);
         rabbitAdmin.declareQueue(observerQueue);
         Binding observerBinding = BindingBuilder.bind(observerQueue)
-                .to(new FanoutExchange(deadLetterExchange));
+                .to(new DirectExchange(deadLetterExchange))
+                .with(deadLetterRoutingKey);
         rabbitAdmin.declareBinding(observerBinding);
 
         try {
             Pedido pedido = Pedido.builder()
-                    .clienteId("ep3-dlq-integration")
+                    .clienteId("ep4-dlq-integration")
                     .estado(EstadoPedido.CREADO)
                     .fechaCreacion(Instant.now())
                     .build();
@@ -180,7 +183,7 @@ class PedidoServiceRabbitIntegrationTest {
                     .andExpect(status().isAccepted());
 
             Message mensajeFallido = rabbitTemplate.receive(observerQueueName, 10_000);
-            assertNotNull(mensajeFallido, "El NACK no publicó en el exchange fanout de DLQ");
+            assertNotNull(mensajeFallido, "El NACK no publicó en la DLQ de notificaciones");
             String payload = new String(mensajeFallido.getBody(), java.nio.charset.StandardCharsets.UTF_8);
             assertTrue(payload.contains("\"forzarFalloParaDlq\":true"));
             Object xDeathHeader = mensajeFallido.getMessageProperties().getHeaders().get("x-death");
@@ -192,9 +195,17 @@ class PedidoServiceRabbitIntegrationTest {
             assertTrue(death.get("count") instanceof Number, "x-death debe incluir un count numérico");
             assertEquals(1L, ((Number) death.get("count")).longValue(),
                     "El NACK sin requeue debe enviar el mensaje a la DLQ una sola vez");
-            assertNull(rabbitTemplate.receive(observerQueueName, 100),
-                    "El mensaje forzado debe llegar una sola vez a la DLQ");
-            esperarColaVacia(deadLetterQueue);
+
+            QueueInformation deadLetterInfo = rabbitAdmin.getQueueInfo(deadLetterQueue);
+            assertNotNull(deadLetterInfo, "La DLQ de notificaciones debe existir");
+            if (deadLetterInfo.getConsumerCount() == 0) {
+                Message queuedMessage = rabbitTemplate.receive(deadLetterQueue, 10_000);
+                assertNotNull(queuedMessage, "El fallo debe quedar en la DLQ operacional");
+                assertNull(rabbitTemplate.receive(deadLetterQueue, 100),
+                        "El mensaje forzado debe llegar una sola vez a la DLQ");
+            } else {
+                esperarColaVacia(deadLetterQueue);
+            }
         } finally {
             rabbitAdmin.removeBinding(observerBinding);
             rabbitAdmin.deleteQueue(observerQueueName);

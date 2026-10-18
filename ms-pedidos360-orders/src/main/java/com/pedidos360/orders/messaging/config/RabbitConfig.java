@@ -3,7 +3,6 @@ package com.pedidos360.orders.messaging.config;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
@@ -20,22 +19,35 @@ public class RabbitConfig {
 
     @Bean
     Queue notificacionesQueue(RabbitProperties properties) {
-        return colaDeNegocio(properties.getQueues().getNotificaciones(), properties);
+        return colaDeNegocio(properties.getQueues().getNotificaciones(),
+                properties.getRoutingKeys().getDlqNotificaciones(), properties);
     }
 
     @Bean
     Queue cocinaPreparacionQueue(RabbitProperties properties) {
-        return colaDeNegocio(properties.getQueues().getCocinaPreparacion(), properties);
+        return colaDeNegocio(properties.getQueues().getCocinaPreparacion(),
+                properties.getRoutingKeys().getDlqCocinaPreparacion(), properties);
     }
 
     @Bean
     Queue facturacionDocumentosQueue(RabbitProperties properties) {
-        return colaDeNegocio(properties.getQueues().getFacturacionDocumentos(), properties);
+        return colaDeNegocio(properties.getQueues().getFacturacionDocumentos(),
+                properties.getRoutingKeys().getDlqFacturacionDocumentos(), properties);
     }
 
     @Bean
-    Queue deadLetterQueue(RabbitProperties properties) {
-        return QueueBuilder.durable(properties.getQueues().getDlq()).build();
+    Queue notificacionesDeadLetterQueue(RabbitProperties properties) {
+        return QueueBuilder.durable(properties.getQueues().getDlqNotificaciones()).build();
+    }
+
+    @Bean
+    Queue cocinaDeadLetterQueue(RabbitProperties properties) {
+        return QueueBuilder.durable(properties.getQueues().getDlqCocinaPreparacion()).build();
+    }
+
+    @Bean
+    Queue facturacionDeadLetterQueue(RabbitProperties properties) {
+        return QueueBuilder.durable(properties.getQueues().getDlqFacturacionDocumentos()).build();
     }
 
     @Bean
@@ -49,8 +61,8 @@ public class RabbitConfig {
     }
 
     @Bean
-    FanoutExchange pedidosDeadLetterExchange(RabbitProperties properties) {
-        return new FanoutExchange(properties.getDeadLetterExchange());
+    DirectExchange pedidosDeadLetterExchange(RabbitProperties properties) {
+        return new DirectExchange(properties.getDeadLetterExchange());
     }
 
     @Bean
@@ -84,11 +96,30 @@ public class RabbitConfig {
     }
 
     @Bean
-    Binding deadLetterBinding(
-            @Qualifier("deadLetterQueue") Queue deadLetterQueue,
-            FanoutExchange pedidosDeadLetterExchange) {
-        return BindingBuilder.bind(deadLetterQueue)
-                .to(pedidosDeadLetterExchange);
+    Binding notificacionesDeadLetterBinding(
+            @Qualifier("notificacionesDeadLetterQueue") Queue deadLetterQueue,
+            DirectExchange pedidosDeadLetterExchange,
+            RabbitProperties properties) {
+        return BindingBuilder.bind(deadLetterQueue).to(pedidosDeadLetterExchange)
+                .with(properties.getRoutingKeys().getDlqNotificaciones());
+    }
+
+    @Bean
+    Binding cocinaDeadLetterBinding(
+            @Qualifier("cocinaDeadLetterQueue") Queue deadLetterQueue,
+            DirectExchange pedidosDeadLetterExchange,
+            RabbitProperties properties) {
+        return BindingBuilder.bind(deadLetterQueue).to(pedidosDeadLetterExchange)
+                .with(properties.getRoutingKeys().getDlqCocinaPreparacion());
+    }
+
+    @Bean
+    Binding facturacionDeadLetterBinding(
+            @Qualifier("facturacionDeadLetterQueue") Queue deadLetterQueue,
+            DirectExchange pedidosDeadLetterExchange,
+            RabbitProperties properties) {
+        return BindingBuilder.bind(deadLetterQueue).to(pedidosDeadLetterExchange)
+                .with(properties.getRoutingKeys().getDlqFacturacionDocumentos());
     }
 
     @Bean
@@ -96,10 +127,10 @@ public class RabbitConfig {
         return new JacksonJsonMessageConverter();
     }
 
-    private Queue colaDeNegocio(String nombre, RabbitProperties properties) {
+    private Queue colaDeNegocio(String nombre, String deadLetterRoutingKey, RabbitProperties properties) {
         return QueueBuilder.durable(nombre)
                 .withArgument("x-dead-letter-exchange", properties.getDeadLetterExchange())
-                .withArgument("x-dead-letter-routing-key", properties.getDeadLetterRoutingKey())
+                .withArgument("x-dead-letter-routing-key", deadLetterRoutingKey)
                 .build();
     }
 }
