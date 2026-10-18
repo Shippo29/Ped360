@@ -18,6 +18,7 @@ services:
       timeout: 5s
       retries: 10
 
+
   rabbitmq1:
     image: rabbitmq:3-management-alpine
     container_name: pedidos360-rabbitmq1
