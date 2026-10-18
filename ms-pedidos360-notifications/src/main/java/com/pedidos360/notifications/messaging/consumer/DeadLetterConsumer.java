@@ -8,14 +8,21 @@ import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Map;
 
 @Component
 @Slf4j
+@ConditionalOnProperty(prefix = "pedidos360.rabbit", name = "dlq-consumer-enabled",
+        havingValue = "true", matchIfMissing = true)
 public class DeadLetterConsumer extends AckingPedidoConsumer {
 
-    @RabbitListener(queues = "${pedidos360.rabbit.queues.dlq}")
+    @RabbitListener(queues = {
+            "${pedidos360.rabbit.queues.dlq-notificaciones}",
+            "${pedidos360.rabbit.queues.dlq-cocina-preparacion}",
+            "${pedidos360.rabbit.queues.dlq-facturacion-documentos}"
+    })
     public void recibir(PedidoMensaje mensaje, Channel channel,
                         @Header(AmqpHeaders.DELIVERY_TAG) long tag,
                         @Headers Map<String, Object> headers) {
