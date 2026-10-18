@@ -75,9 +75,7 @@ El wrapper Maven descarga Maven cuando hace falta.
 
    ```powershell
    docker compose config
-   docker ps -a --filter "name=pedidos360-rabbitmq"
-   # Si el broker antiguo está en ejecución, detenlo sin borrarlo.
-   docker stop pedidos360-rabbitmq
+   docker compose ps
    docker compose up -d postgres
    docker compose up -d rabbitmq1
    docker compose up -d rabbitmq2
@@ -88,8 +86,16 @@ El wrapper Maven descarga Maven cuando hace falta.
    RabbitMQ está en `localhost:5672` y `localhost:5673`, y sus consolas en
    `http://localhost:15672` y `http://localhost:15673`. Comprueba el clúster con
    `docker exec pedidos360-rabbitmq1 rabbitmq-diagnostics cluster_status`.
-   Inicia cada servicio en una terminal independiente siguiendo
-   [GUIA_EJECUCION.md](./GUIA_EJECUCION.md).
+
+Para arrancar toda la aplicación en contenedores, incluida la interfaz:
+
+```powershell
+docker compose up -d
+docker compose ps
+```
+
+Compose inicia las dependencias antes que Catalog, Orders, Notifications, BFF,
+Rabbit-admin y Frontend.
 
 3. Compila y prueba con JDK 21 o superior:
 
