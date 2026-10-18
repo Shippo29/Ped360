@@ -126,6 +126,8 @@ services:
       RABBITMQ_ADDRESSES: rabbitmq1:5672,rabbitmq2:5672
       RABBITMQ_USER: ${RABBITMQ_USER:-pedidos360}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-replace-before-exposing}
+      DLQ_CONSUMER_ENABLED: ${DLQ_CONSUMER_ENABLED:-true}
+      CONSUMER_DELAY_MS: ${CONSUMER_DELAY_MS:-0}
     ports:
       - "8083:8083"
     depends_on:

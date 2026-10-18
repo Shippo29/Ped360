@@ -148,6 +148,16 @@ Set-Location ..
 .\scripts\ep4\Publicar-MensajesDemo.ps1 -Count 15
 ```
 
+Al ejecutar Notifications en Docker Compose, pasa esos valores al contenedor
+antes de recrearlo:
+
+```powershell
+$env:CONSUMER_DELAY_MS = '15000'
+$env:DLQ_CONSUMER_ENABLED = 'false'
+docker compose up -d --force-recreate notifications
+Remove-Item Env:CONSUMER_DELAY_MS, Env:DLQ_CONSUMER_ENABLED
+```
+
 El script solicita credenciales de forma oculta y publica mensajes de
 notificaciones normales, cocina y fallo controlado. El NACK deja un error en el
 log aunque el consumer de DLQ esté apagado. Al reactivar el consumer, confirmará
